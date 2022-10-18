@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:43:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/16 21:38:21 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/18 23:10:15 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,14 @@ int	ft_bulletin(char *cmd)
 		run_rediction(lst_of_red);
 	ptr = args_lst_to_tab(lst_of_args);
 	ft_convert_to_lower(ptr[0]);
-	/*
-		if (ft_strcmp(ptr[0], "exit") == 0)
-			return (ft_exit(ptr[0]), 1);
-		if (ft_strcmp(ptr[0], "pwd") == 0)
-			return (ft_pwd(ptr[0]), 1);
-		if (ft_strcmp(ptr[0], "env") == 0)
-			return (ft_env(t), 1);
-	*/
-	if (ft_strcmp(ptr[0], "cd") == 0)
-		return (ft_cd(ptr[1]), 1);
+	if (ft_strcmp(ptr[0], "pwd") == 0)
+		return (ft_pwd(), 1);
+	if (ft_strcmp(ptr[0], "exit") == 0)
+		return (ft_exit(ptr), 1);
+	else if (ft_strcmp(ptr[0], "echo") == 0)
+		return (ft_echo(ptr), 1);
+	else if (ft_strcmp(ptr[0], "cd") == 0)
+		return (ft_cd(ptr), 1);
 	else if (ft_strcmp(ptr[0], "env") == 0)
 		return (ft_env(), 1);
 	else if (ft_strcmp(ptr[0], "unset") == 0)
@@ -144,6 +142,19 @@ int	only_space(char *cmd)
 }
 
 
+
+void	handler(int sig)
+{
+	(void)sig;
+	g_var.doc = 1;
+	rl_done = 1;
+}
+
+int event(void)
+{
+	return 0;
+}
+
 void	ft_run_heredoc(t_lexm **lexer)
 {
 	t_lexm		*tmp;
@@ -151,8 +162,11 @@ void	ft_run_heredoc(t_lexm **lexer)
 	int 		fd;
 	static int	nb;
 	char		*file_name;
-	
+
 	tmp = *lexer;
+	g_var.doc = 0;
+	signal(SIGINT, handler);
+	rl_event_hook = event;
 	while (tmp)
 	{
 		if (tmp->type == HEREDOC)
@@ -162,7 +176,7 @@ void	ft_run_heredoc(t_lexm **lexer)
 			while (1)
 			{
 				line = readline("> ");
-				if (ft_strcmp(tmp->next->cmd, line) == 0)
+				if (!line || ft_strcmp(tmp->next->cmd, line) == 0 || g_var.doc)
 				{
 					tmp->cmd = "<";
 					tmp->next->cmd = file_name;
@@ -248,6 +262,16 @@ char *lexter_to_string(t_lexm *lxm)
 	}
 	return ret;
 }
+
+void	handle_sig(int pid)
+{
+	(void)pid;
+	rl_replace_line("", 0);
+	printf("\n");
+	rl_on_new_line();
+	rl_redisplay();
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*cmd;
@@ -259,12 +283,16 @@ int	main(int ac, char **av, char **env)
 	(void)av;
 	if (ac == 1)
 	{
+		signal(SIGQUIT, SIG_IGN);
+		signal(SIGINT, handle_sig);
 		ft_new_env(env);
 		while (1)
 		{
+			g_var.garbage = NULL;
+			g_var.doc = 0;
 			cmd = readline("\033[37mFRATELLO😈=> ");
 			if (!cmd)
-				break ; // free allocated memory
+				break ;
 			if (cmd[0] == '\0' || only_space(cmd))
 				continue ;
 			add_history(cmd);
@@ -274,7 +302,12 @@ int	main(int ac, char **av, char **env)
 			if (ft_syntax_general(cmd) == 1)
 				printf("\033[31mMinishell : syntax error !!!\n\033[37m");
 			else
-				ft_pipe(cmd);
+			{
+				if (g_var.doc == 1)
+					g_var.doc = 0;
+				else
+					ft_pipe(cmd);
+			}
 			dup2(fd[0], 0);
 			dup2(fd[1], 1);
 		}

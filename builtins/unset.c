@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skasmi <skasmi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:56:16 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/12 16:50:53 by skasmi           ###   ########.fr       */
+/*   Updated: 2022/10/18 23:07:21 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,75 +24,39 @@ void	ft_unset_more_then_one(char **ptr)
 	}
 }
 
-/*
 void	ft_unset(char *cmd)
 {
-    t_env   *tmp_prev;
-    t_env   *tmp;
-
-    tmp = g_var.env;
-    if (tmp->next)
-    {
-        tmp_prev = tmp;
-    }
-    while (tmp)
-    {
-        if (ft_strcmp(cmd, tmp->data) == 0)
-        {
-            g_var.env = g_var.env->next;
-            break ;
-        }
-        else if (tmp->next)
-        {
-            
-            if(ft_strcmp(cmd, tmp->next->data) == 0)
-            {
-               
-                tmp_prev = tmp->next;
-                tmp_prev->next = tmp_prev;
-                break ;
-            }
-        }
-        tmp = tmp->next;
-    }
-}
-*/
-
-void	ft_unset(char *cmd)
-{
-	t_env *tmp_next;
-	t_env *tmp_prev;
-	t_env *tmp;
+	t_env	*tmp_next;
+	t_env	*tmp_prev;
+	t_env	*tmp;
 
 	tmp = g_var.env;
-	if (tmp && tmp->next == NULL && tmp->prev == NULL)
-	{
-		if (ft_strcmp(cmd, tmp->data) == 0)
-			g_var.env = NULL;
-		return ;
-	}
-
 	while (tmp)
 	{
-		tmp_next = tmp->next;
-		tmp_prev = tmp->prev;
 		if (ft_strcmp(cmd, tmp->data) == 0)
 		{
-			// free current node
-			if (tmp_prev)
+			if (tmp && tmp->next == NULL && tmp->prev == NULL)
 			{
-				tmp_prev->next = tmp_next;
-				if (tmp_next)
-					tmp_next->prev = tmp_prev;
+				printf("jjjj\n");
+				g_var.env = NULL;
+				break;
 			}
-			else
+			else if (tmp && tmp->next && tmp->prev == NULL)
 			{
-				g_var.env = tmp_next;
-				if (tmp_next)
-					tmp_next->prev = NULL;
+				g_var.env = g_var.env->next;
+				break;
 			}
+			else if (tmp && tmp->next == NULL && tmp->prev)
+			{
+				tmp->prev->next = NULL;
+				break;
+			}
+			tmp_next = tmp->next;
+			tmp_prev = tmp->prev;
+			tmp_prev->next = tmp_next;
+			tmp_next->prev = tmp_prev;
 			break ;
 		}
-		tmp = tmp_next;
+		tmp = tmp->next;
 	}
 }

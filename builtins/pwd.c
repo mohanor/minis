@@ -6,20 +6,22 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:23:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/14 13:28:42 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/18 23:06:59 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-// char buff[1024];
-
-// if ((getcwd(buff, sizeof(buff))) == NULL)
-//     printf("Erroooor\n");
-// else
-void	ft_pwd()
+void	ft_pwd(void)
 {
 	char	s[1024];
+	char	*pwd;
 
-	printf("%s\n", getcwd(s, 1024));
+	pwd = get_from_env("PWD");
+	if (!pwd)
+	{
+		getcwd(s, 1024);
+		pwd = ft_strdup(s);
+	}
+	printf("%s\n", pwd);
 }

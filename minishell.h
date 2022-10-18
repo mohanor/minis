@@ -6,21 +6,21 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:44:10 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/16 22:40:52 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/18 23:12:37 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <./libc.h>
+# include <stdio.h>
 # include <readline/history.h>
 # include <readline/readline.h>
+# include <./libc.h>
 # include <signal.h>
-# include <stdio.h>
+# include <unistd.h>
 # include <stdlib.h>
 # include <string.h>
-# include <unistd.h>
 
 # define PIPE 1
 # define WORD 2
@@ -40,10 +40,18 @@ typedef struct s_env
 	struct s_env	*prev;
 }					t_env;
 
+typedef struct s_garbage
+{
+	void *ptr;
+	struct s_garbage *next;
+} t_garbage;
+
 typedef struct s_global_var
 {
 	t_env			*env;
+	t_garbage		*garbage;
 	int				status;
+	int				doc;
 }					t_global_var;
 
 t_global_var		g_var;
@@ -103,6 +111,9 @@ typedef struct s_lexm
 
 //syntax error **********************************
 
+
+void	add_garbage(void *value);
+
 // int	ft_check_parenthese(char *cmd);
 
 int					ft_check_pipe(char *cmd);
@@ -157,11 +168,11 @@ void				ft_pwd(void);
 void				ft_export(char **cmd);
 void				*ft_get_data(char *cmd);
 char				*ft_get_value(char *cmd);
-void				ft_cd(char *path);
+void				ft_cd(char **path);
 // char		*ft_get_home(t_env *t);
 
 char				*ft_get_home(void);
-int					ft_exit(char *cmd);
+int					ft_exit(char **cmd);
 void				ft_unset(char *cmd);
 void				ft_unset_more_then_one(char **ptr);
 char				*ft_get_cd(char *cmd);
@@ -180,7 +191,7 @@ t_pipe				*ft_lstnew(char *content);
 void				ft_start_exe(t_pipe *lst);
 void				ft_execution(char *cmd);
 char				**ft_get_env2(void);
-
+void				ft_echo(char **cmd);
 void				ft_lstadd_back_red(t_redic **lst, char *new, char c);
 void				ft_lstadd_front_red(t_redic **lst, t_redic *new);
 t_redic				*ft_lstlast_red(t_redic *lst);

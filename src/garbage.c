@@ -1,39 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lst_pipe.c                                         :+:      :+:    :+:   */
+/*   garbage.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/26 20:37:15 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:02:31 by matef            ###   ########.fr       */
+/*   Created: 2022/10/18 20:57:16 by matef             #+#    #+#             */
+/*   Updated: 2022/10/18 23:01:50 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	ft_lstadd_back(t_pipe **lst, char *new)
-{
-	t_pipe	*lstptr;
 
-	if (!*lst)
-	{
-		ft_lstadd_front(lst, ft_lstnew(new));
-		return ;
-	}
-	lstptr = ft_lstlast(*lst);
-	lstptr->next = ft_lstnew(new);
-}
 
-void	ft_lstadd_front(t_pipe **lst, t_pipe *new)
+void	ft_lstadd_front_garbage(t_garbage **lst, t_garbage *new)
 {
 	new->next = *lst;
 	*lst = new;
 }
 
-t_pipe	*ft_lstlast(t_pipe *lst)
+t_garbage	*ft_lstnew_garbage(void *content)
 {
-	t_pipe	*ptr;
+	t_garbage	*node;
+
+	node = (t_garbage *)malloc(sizeof(t_garbage));
+	if (!node)
+		return (0);
+	node->ptr = content;
+	node->next = 0;
+	return (node);
+}
+
+t_garbage	*ft_lstlast_garbage(t_garbage *lst)
+{
+	t_garbage	*ptr;
 
 	ptr = lst;
 	while (ptr)
@@ -45,14 +46,15 @@ t_pipe	*ft_lstlast(t_pipe *lst)
 	return (ptr);
 }
 
-t_pipe	*ft_lstnew(char *content)
+void	add_garbage(void *value)
 {
-	t_pipe *node;
+	t_garbage	*lstptr;
 
-	node = (t_pipe *)malloc(sizeof(t_pipe));
-	if (!node)
-		return (0);
-	node->cmd = ft_expand(content);
-	node->next = 0;
-	return (node);
+	if (!g_var.garbage)
+	{
+		ft_lstadd_front_garbage(&g_var.garbage, ft_lstnew_garbage(value));
+		return ;
+	}
+	lstptr = ft_lstlast_garbage(g_var.garbage);
+	lstptr->next = ft_lstnew_garbage(value);
 }

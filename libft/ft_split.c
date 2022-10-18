@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skasmi <skasmi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/21 02:46:32 by skasmi            #+#    #+#             */
-/*   Updated: 2021/11/27 22:24:07 by skasmi           ###   ########.fr       */
+/*   Updated: 2022/10/18 21:19:52 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "libft.h"
 
 int	ft_is_separator(char c, char cr)

@@ -3,67 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skasmi <skasmi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:55:51 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/12 16:52:12 by skasmi           ###   ########.fr       */
+/*   Updated: 2022/10/18 23:06:42 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-/*
-char	*ft_get_value(char *cmd)
-{
-	int		i;
-	int		j;
-	char	*value;
-
-	value = NULL;
-	j = 0;
-	i = 0;
-	while (cmd[i])
-	{
-		if (cmd[i] == '=')
-		{
-			while (cmd[i])
-			{
-				i++;
-				j++;
-			}
-		}
-		i++;
-	}
-	i = 0;
-	while (cmd[i])
-	{
-		if (cmd[i] == '=')
-		{
-			value = ft_substr(cmd, ++i, j);
-			break ;
-		}
-		i++;
-	}
-	return (ft_strdup(value));
-}
-
-void	*ft_get_data(char *cmd)
-{
-	char	*str;
-	int		i;
-	int		j;
-
-	
-	i = 0;
-	while (cmd[i] != '=' && cmd[i])
-	{
-		str[j] = cmd[i];
-		i++;
-	}
-	str[j] = '\0';
-	return (ft_strdup(str));
-}
-
-*/
 
 char	*get_from_env(char *var)
 {
@@ -91,8 +38,10 @@ void	ft_export(char **cmd)
 
 	tmp = g_var.env;
 	i = 1;
+
 	while (cmd[i])
 	{
+		printf("%s\n", cmd[i]);
 		to_exp = cmd[i];
 		if (ft_strstr(to_exp, "="))
 		{
@@ -109,25 +58,27 @@ void	ft_export(char **cmd)
 		}
 		else
 		{
+			ft_unset(cmd[i]);
 			var = cmd[i];
 			val = NULL;
 		}
 		new = (t_env *)malloc(sizeof(t_env));
 		if (!new)
 			return ;
-		new->data = var;
-		new->value = val;
-		new->next = NULL;
-		if (!g_var.env)
-			g_var.env = new;
-		else
-		{
-			tmp = g_var.env;
-			while (tmp->next)
-				tmp = tmp->next;
-			tmp->next = new;
-			new->prev = tmp;
-		}
+
+			new->data = var;
+			new->value = val;
+			new->next = NULL;
+			if (!g_var.env)
+				g_var.env = new;
+			else
+			{
+				tmp = g_var.env;
+				while (tmp->next)
+					tmp = tmp->next;
+				tmp->next = new;
+				new->prev = tmp;
+			}
 		i++;
 	}
 }
