@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:55:51 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:06:42 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 00:59:12 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ void	ft_export(char **cmd)
 		new = (t_env *)malloc(sizeof(t_env));
 		if (!new)
 			return ;
-
 			new->data = var;
 			new->value = val;
 			new->next = NULL;

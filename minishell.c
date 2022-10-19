@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:43:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:10:15 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 00:53:05 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ int	ft_bulletin(char *cmd)
 	ft_get_args_and_red(cmd, &lst_of_args, &lst_of_red);
 	if (lst_of_red)
 		run_rediction(lst_of_red);
+	if (!lst_of_args)
+		return 0;
 	ptr = args_lst_to_tab(lst_of_args);
 	ft_convert_to_lower(ptr[0]);
 	if (ft_strcmp(ptr[0], "pwd") == 0)
@@ -171,7 +173,7 @@ void	ft_run_heredoc(t_lexm **lexer)
 	{
 		if (tmp->type == HEREDOC)
 		{
-			file_name = ft_strjoin("here_file_", ft_itoa(nb++));
+			file_name = ft_strjoin("/tmp/here_file_", ft_itoa(nb++));
 			fd = open(file_name, O_RDWR | O_CREAT, 0666);
 			while (1)
 			{
@@ -246,7 +248,6 @@ t_lexm *ft_lexer(char *cmd)
 		}
 		i++;
 	}
-
 	return lexer;
 }
 
@@ -296,18 +297,25 @@ int	main(int ac, char **av, char **env)
 			if (cmd[0] == '\0' || only_space(cmd))
 				continue ;
 			add_history(cmd);
-			here = ft_lexer(cmd);
-			ft_run_heredoc(&here);
-			cmd = lexter_to_string(here);
 			if (ft_syntax_general(cmd) == 1)
-				printf("\033[31mMinishell : syntax error !!!\n\033[37m");
+			{
+				here = ft_lexer(cmd);
+				ft_run_heredoc(&here);
+				cmd = lexter_to_string(here);
+				ft_putstr_fd("\033[31mMinishell : syntax error !!!\n\033[37m", 2);
+			}
 			else
 			{
+				here = ft_lexer(cmd);
+				ft_run_heredoc(&here);
+				cmd = lexter_to_string(here);
+				
 				if (g_var.doc == 1)
 					g_var.doc = 0;
 				else
 					ft_pipe(cmd);
 			}
+			free(cmd);
 			dup2(fd[0], 0);
 			dup2(fd[1], 1);
 		}

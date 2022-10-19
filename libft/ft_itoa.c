@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/21 22:25:28 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:01:28 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 00:54:02 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ char	*ft_itoa(int n)
 	tmp = malloc(sizeof(char) * (k + 1));
 	if (!tmp)
 		return (NULL);
+	add_garbage(tmp);
 	if (n < 0)
 	{
 		tmp[0] = '-';
