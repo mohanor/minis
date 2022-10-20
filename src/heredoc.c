@@ -6,22 +6,15 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/04 00:33:57 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:01:53 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 01:17:48 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	ft_heredoc(void)
-{
-	char	*hear;
-
-	hear = readline(">");
-}
 
 void	add_to_lexer(t_lexm **lst, char *content)
 {
-	
 	t_lexm	*tmp;
 
 	tmp = *lst;
@@ -60,6 +53,7 @@ t_lexm	*new_lexer(char *content)
 	node = (t_lexm *)malloc(sizeof(t_lexm));
 	if (!node)
 		return (0);
+	add_garbage(node);
 	node->cmd = content;
 	node->type = token(content);
 	node->next = NULL;

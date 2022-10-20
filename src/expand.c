@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 04:45:00 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/16 22:49:51 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 20:52:05 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ char	*ft_expand(char *cmd)
 	char	*value;
 	int		expand;
 
-	expand = 1;
 	i = 0;
+	expand = 1;
 	ret = ft_strdup("");
 	while (cmd[i])
 	{
@@ -54,12 +54,10 @@ char	*ft_expand(char *cmd)
 			{
 				name = get_name(&cmd[i + 1]);
 				value = get_from_env(name);
-				// value = NULL;
 				if (value)
 					ret = ft_strjoin(ret, value);
 				else
 					ret = ft_strjoin(ret, "");
-				// ret = ft_strjoin(ret, (char *)((long)value * (value != NULL) + (long)"" * (value == NULL)));
 				i += ft_strlen(name) + 1;
 				continue ;
 			}

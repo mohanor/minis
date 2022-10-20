@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:55:51 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/19 00:59:12 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 23:49:49 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,8 @@ void	ft_export(char **cmd)
 
 	tmp = g_var.env;
 	i = 1;
-
 	while (cmd[i])
 	{
-		printf("%s\n", cmd[i]);
 		to_exp = cmd[i];
 		if (ft_strstr(to_exp, "="))
 		{
@@ -65,19 +63,20 @@ void	ft_export(char **cmd)
 		new = (t_env *)malloc(sizeof(t_env));
 		if (!new)
 			return ;
-			new->data = var;
-			new->value = val;
-			new->next = NULL;
-			if (!g_var.env)
-				g_var.env = new;
-			else
-			{
-				tmp = g_var.env;
-				while (tmp->next)
-					tmp = tmp->next;
-				tmp->next = new;
-				new->prev = tmp;
-			}
+    	// add_garbage(new);
+		new->data = var;
+		new->value = val;
+		new->next = NULL;
+		if (!g_var.env)
+			g_var.env = new;
+		else
+		{
+			tmp = g_var.env;
+			while (tmp->next)
+				tmp = tmp->next;
+			tmp->next = new;
+			new->prev = tmp;
+		}
 		i++;
 	}
 }

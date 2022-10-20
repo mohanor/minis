@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:43:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/19 00:53:05 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 01:30:15 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int	ft_bulletin(char *cmd)
 	ptr = args_lst_to_tab(lst_of_args);
 	ft_convert_to_lower(ptr[0]);
 	if (ft_strcmp(ptr[0], "pwd") == 0)
-		return (ft_pwd(), 1);
+		return (ft_pwd(ptr), 1);
 	if (ft_strcmp(ptr[0], "exit") == 0)
 		return (ft_exit(ptr), 1);
 	else if (ft_strcmp(ptr[0], "echo") == 0)
@@ -143,8 +143,6 @@ int	only_space(char *cmd)
 	return (1);
 }
 
-
-
 void	handler(int sig)
 {
 	(void)sig;
@@ -178,6 +176,7 @@ void	ft_run_heredoc(t_lexm **lexer)
 			while (1)
 			{
 				line = readline("> ");
+				add_garbage(line);
 				if (!line || ft_strcmp(tmp->next->cmd, line) == 0 || g_var.doc)
 				{
 					tmp->cmd = "<";
@@ -284,14 +283,16 @@ int	main(int ac, char **av, char **env)
 	(void)av;
 	if (ac == 1)
 	{
+		g_var.garbage = NULL;
 		signal(SIGQUIT, SIG_IGN);
 		signal(SIGINT, handle_sig);
 		ft_new_env(env);
 		while (1)
 		{
-			g_var.garbage = NULL;
+			here = NULL;
 			g_var.doc = 0;
-			cmd = readline("\033[37mFRATELLO😈=> ");
+			cmd = readline("FRATELLO😈=> ");
+			add_garbage(cmd);
 			if (!cmd)
 				break ;
 			if (cmd[0] == '\0' || only_space(cmd))
@@ -309,15 +310,14 @@ int	main(int ac, char **av, char **env)
 				here = ft_lexer(cmd);
 				ft_run_heredoc(&here);
 				cmd = lexter_to_string(here);
-				
 				if (g_var.doc == 1)
 					g_var.doc = 0;
 				else
 					ft_pipe(cmd);
 			}
-			free(cmd);
 			dup2(fd[0], 0);
 			dup2(fd[1], 1);
+			// free_garbage();
 		}
 		close(fd[0]);
 		close(fd[1]);

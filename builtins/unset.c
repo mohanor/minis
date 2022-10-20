@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:56:16 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:07:21 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 21:13:22 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,17 +39,17 @@ void	ft_unset(char *cmd)
 			{
 				printf("jjjj\n");
 				g_var.env = NULL;
-				break;
+				break ;
 			}
 			else if (tmp && tmp->next && tmp->prev == NULL)
 			{
 				g_var.env = g_var.env->next;
-				break;
+				break ;
 			}
 			else if (tmp && tmp->next == NULL && tmp->prev)
 			{
 				tmp->prev->next = NULL;
-				break;
+				break ;
 			}
 			tmp_next = tmp->next;
 			tmp_prev = tmp->prev;

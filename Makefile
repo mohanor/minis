@@ -6,7 +6,7 @@
 #    By: matef <matef@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/27 15:37:33 by skasmi            #+#    #+#              #
-#    Updated: 2022/10/18 23:13:15 by matef            ###   ########.fr        #
+#    Updated: 2022/10/19 21:15:57 by matef            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,6 +41,7 @@ SRCS=	minishell.c \
 		libft/ft_strdup.c \
 		libft/ft_memcpy.c \
 		libft/ft_putstr_fd.c \
+		libft/ft_strncmp.c \
 		libft/ft_strnstr.c \
 		builtins/env.c \
 		builtins/export.c \
@@ -80,7 +81,7 @@ $(NAME) : $(OBJCTS) $(NAME2)
 		@echo "\033[93m╚═╝░░░░░╚═╝╚═╝╚═╝░░╚══╝╚═╝╚═════╝░╚═╝░░╚═╝╚══════╝╚══════╝╚══════╝\033[0m"
 
 %.o: %.c minishell.h
-	cc $(flags) -I $(INCLUDE_READLINE) -c $< -o $@
+	cc $(CFLAGS) -I $(INCLUDE_READLINE) -c $< -o $@
 
 all: $(NAME)
 	

@@ -3,13 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skasmi <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:07:35 by skasmi            #+#    #+#             */
-/*   Updated: 2021/11/26 04:49:39 by skasmi           ###   ########.fr       */
+/*   Updated: 2022/10/19 03:47:57 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "libft.h"
+
 
 void	ft_bzero(void *str, size_t n)
 {
@@ -24,10 +24,4 @@ void	ft_bzero(void *str, size_t n)
 		i++;
 	}
 }
-/*
-int main()
-{
-	int s[] = {1, 2, 3};
-	ft_bzero(s, 2);
-	printf("%d",s);
-}*/
+

@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 20:37:15 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:02:31 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 00:00:30 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ t_pipe	*ft_lstnew(char *content)
 	node = (t_pipe *)malloc(sizeof(t_pipe));
 	if (!node)
 		return (0);
+	add_garbage(node);
 	node->cmd = ft_expand(content);
 	node->next = 0;
 	return (node);

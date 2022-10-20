@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:22:44 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/19 00:57:48 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 01:34:16 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,11 @@ char	**ft_get_env2(void)
 		tmp = tmp->next;
 	}
 	tmp = g_var.env;
-	i = 0;
 	ptr = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!ptr)
 		return (NULL);
+	i = 0;
+	add_garbage(ptr);
 	while (tmp)
 	{
 		ptr[i++] = ft_strjoin(ft_strjoin(tmp->data, "="), tmp->value);
@@ -172,6 +173,7 @@ char	**args_lst_to_tab(t_pipe *lst_of_args)
 	args = (char **)malloc(sizeof(char *) * (len + 1));
 	if (!args)
 		return (NULL);
+	add_garbage(args);
 	i = 0;
 	tmp = lst_of_args;
 	while (tmp)

@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/17 13:58:28 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/19 00:58:11 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 23:59:34 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	if (start >= (unsigned int)ft_strlen(s))
 	{
 		ptr = malloc(1);
+		add_garbage(ptr);
 		ptr[0] = 0;
 		return (ptr);
 	}
@@ -32,6 +33,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		ptr = (char *)malloc(len + 1);
 	if (!ptr)
 		return (NULL);
+	add_garbage(ptr);
 	while (s[start + ++i] && i < len)
 		ptr[i] = s[start + i];
 	ptr[i] = 0;

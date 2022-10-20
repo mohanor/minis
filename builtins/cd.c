@@ -6,81 +6,67 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:40:28 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/18 23:10:46 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/19 23:22:58 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-char 	*getname(char *str)
+int	ft_check_change_dir(char *cmd)
 {
-	int i;
-	int j;
-	
-	j = 0;
-	i = 0;
-	while(!ft_isalpha(str[i]))
-		i++;
-	char *ret = malloc(ft_strlen(str) - i);
-	while(i < ft_strlen(str))
-	{
-		ret[j] = str[i];
-		i++;
-		j++;
-	}
-	ret[i] = '\0';
-	return(ret);
+	char	str[1024];
+
+	if (ft_strncmp(cmd, ".", 255) && !getcwd(str, 1024))
+		ft_putstr_fd("cd: error retrieving current directory: \
+getcwd: cannot access parent directories", 2);
+	return (chdir(cmd));
 }
 
-char *getlast(char *str)
+void	ft_error_cmd(char **cmd)
 {
-	int j;
-	int i;
+	printf("%s: invalid option %c\n", cmd[0], cmd[1][1]);
+	printf("cd: usage [without options] [dir]\n");
+	return ;
+}
+
+void	ft_change_pwd_and_old(char *ptr, char	*cwd)
+{
+	t_env	*t;
+	// ;
 	
-	i = 0;
-	j = ft_strlen(str);
-	while(str[j] != '/')
-		j--;
-	char *ret = malloc(j);
-	while(i < j)
-	{
-		ret[i] = str[i];
-		i++;
-	}
-	ret[i] = '\0';
-	return(ret);	
+	t = g_var.env;
+	while (t)
+		{
+			if (ft_strcmp(ptr, t->data) == 0)
+			{
+				if (!cwd)
+					perror("cd: error retrieving current directory: getcwd: cannot access parent directories");
+				else
+				{
+					t->value = cwd; // free
+				}
+				return ;
+			}
+			t = t->next;
+		}
 }
 
 void	ft_cd(char **path)
 {
 	char	*home;
+	int		nb;
 	t_env	*t;
+	char 	*s;
 
 	t = g_var.env;
-	if(ft_strcmp(path[1], ".") == 0)
+	nb = 0;
+	if (path[1] == NULL)
 	{
-	// 	if (errno)
-	// 		printf("error retrieving current directory: getcwd:\
-	// cannot access parent directories: No such file or directory\n");
-		return;
-	}
-	else if(ft_strcmp(path[1],"..") == 0)
-	{
-		chdir("..");
-		while (t)
-		{
-			if (ft_strcmp("PWD", t->data) == 0)
-				t->value = getlast(t->value);
-			t = t->next;
-		}
-		return;
-	}
-	else if (path[1] == NULL)
-	{
-		home = getenv("HOME");
+		home = get_from_env("HOME");
 		if (!home)
 		{
 			ft_puterror("cd", ": HOME not set");
+			write (1, "\n", 1);
 			return ;
 		}
 		chdir(home);
@@ -89,33 +75,29 @@ void	ft_cd(char **path)
 			if (ft_strcmp("PWD", t->data) == 0)
 			{
 				t->value = home;
-				return;
+				return ;
 			}
 			t = t->next;
 		}
-		// return;
+		return ;
 	}
+	if (!path || !*path || ft_strncmp(path[0], "cd", 255))
+		return ;
+	if (path[1] && path[1][0] == '-' && path[1][1] != '\0' && path[1][1] != '-')
+		ft_error_cmd(path);
 	else if (path[1])
 	{
-		if(access(path[1], X_OK) == -1)
-		{
-			ft_puterror(path[1], ": No such file or directory\n");
-			return;
-		}
-		chdir(path[1]);
-		while (t)
-		{
-			if (ft_strcmp("PWD", t->data) == 0)
-			{
-				t->value = ft_strjoin(t->value,"/");
-				t->value = ft_strjoin(t->value,getname(path[1]));
-				return;
-			}
-			t = t->next;
-		}
-	}	
-	ft_puterror(path[1], ": No such file or directory\n");
-
-	
-	return ;
+		s = getcwd(NULL, 0);
+		add_garbage(s);
+		ft_change_pwd_and_old("OLDPWD", s);
+		nb = chdir(path[1]);
+	}
+	if (nb < 0)
+		perror("cd");
+	else
+	{
+		s = getcwd(NULL, 0);
+		add_garbage(s);
+		ft_change_pwd_and_old("PWD", s);
+	}
 }
