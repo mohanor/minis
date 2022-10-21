@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/20 03:00:27 by matef             #+#    #+#             */
-/*   Updated: 2022/10/21 00:46:08 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/21 09:37:13 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,45 +78,38 @@ char	*init_lexer(int *i, t_lexm	**lexer)
 	return (ft_strdup(""));
 }
 
-void ft_to_exp(int *i, char *cmd, t_lexm **lexer, char **to_expand)
+void	ft_to_exp(int *i, char *cmd, t_lexm **lexer, char **to_expand)
 {
 	set_to_expand(lexer, to_expand);
 	ft_lexer_2(i, cmd, lexer);
 }
-/*
-t_lexm	*ft_lexer(char *cmd)
-{
-	int		i;
-	char	*to_expand;
-	t_lexm	*lexer;
 
-	i = -1;
-	to_expand = ft_strdup("");
-	lexer = NULL;
-	while (cmd[++i])
+char	*ft_lexer_22(int *i, char *cmd, t_lexm **lexer, char *to_expand)
+{
+	if (cmd[*i] != '>' && cmd[*i] != '<' && cmd[*i] != '|')
+		to_expand = ft_strjoin(to_expand, ft_substr(cmd, *i, 1));
+	else
 	{
-		while (cmd[i] && cmd[i] != ' ')
+		if (to_expand[0] != '\0')
 		{
-			if (cmd[i] == '\'' || cmd[i] == '\"')
-				to_expand = ft_lexer_1(&i, cmd, to_expand);
-			else
-			{
-				if (cmd[i] != '>' && cmd[i] != '<' && cmd[i] != '|')
-					to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				else
-					ft_to_exp(&i, cmd, &lexer, &to_expand);
-				i++;
-			}
+			add_to_lexer(lexer, to_expand);
+			to_expand = ft_strdup("");
 		}
-		set_to_expand(&lexer, &to_expand);
+		if (cmd[*i + 1] == cmd[*i])
+		{
+			add_to_lexer(lexer, ft_substr(cmd, *i, 2));
+			(*i)++;
+		}
+		else
+			add_to_lexer(lexer, ft_substr(cmd, *i, 1));
 	}
-	return (lexer);
-}*/
+	(*i)++;
+	return (to_expand);
+}
 
 t_lexm *ft_lexer(char *cmd)
 {
 	int 	i;
-	char 	qouts;
 	char 	*to_expand;
 	t_lexm 	*lexer;
 
@@ -128,39 +121,9 @@ t_lexm *ft_lexer(char *cmd)
 		while (cmd[i] && cmd[i] != ' ')
 		{
 			if (cmd[i] == '\'' || cmd[i] == '\"')
-			{
-				qouts = cmd[i];
-				to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				i++;
-				while (cmd[i] && cmd[i] != qouts)
-				{
-					to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-					i++;
-				}
-				to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				i++;
-			}
+				to_expand = ft_lexer_1(&i, cmd, to_expand);
 			else
-			{
-				if (cmd[i] != '>' && cmd[i] != '<' && cmd[i] != '|')
-					to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				else
-				{
-					if (to_expand[0] != '\0')
-					{
-						add_to_lexer(&lexer, to_expand);
-						to_expand = ft_strdup("");
-					}
-					if (cmd[i + 1] == cmd[i])
-					{
-						add_to_lexer(&lexer, ft_substr(cmd, i, 2));
-						i++;
-					}
-					else
-						add_to_lexer(&lexer, ft_substr(cmd, i, 1));
-				}
-				i++;
-			}
+				to_expand = ft_lexer_22(&i, cmd, &lexer, to_expand);
 		}
 		if (to_expand[0] != '\0')
 		{
@@ -169,5 +132,5 @@ t_lexm *ft_lexer(char *cmd)
 		}
 		i++;
 	}
-	return lexer;
+	return (lexer);
 }

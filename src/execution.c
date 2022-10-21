@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:22:44 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/20 23:01:44 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/21 08:52:22 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,10 +120,33 @@ void	ft_start_exe(t_pipe *lst)
 	get_status();
 }
 
-void	ft_get_args_1(int *i, char *cmd, char c, t_redic **lst_of_red)
-{
-	int	j;
 
+void	ft_get_args(char *cmd, t_pipe **lst_of_args, int *i)
+{
+	int		j;
+	char	c;
+
+	j = *i;
+	while (cmd[*i] && cmd[*i] != ' ' && cmd[*i] != '>' && cmd[*i] != '<')
+	{
+		if (cmd[*i] && (cmd[*i] == '\"' || cmd[*i] == '\''))
+		{
+			c = cmd[*i];
+			(*i)++;
+			while (cmd[*i] && (cmd[*i] != c))
+				(*i)++;
+		}
+		(*i)++;
+	}
+	ft_lstadd_back(lst_of_args, ft_substr(cmd, j, *i - j));
+}
+
+void	ft_get_red(char *cmd, int *i, t_redic **lst_of_red)
+{
+	int		j;
+	char	c;
+
+	c = cmd[*i];
 	(*i)++;
 	if (cmd[*i] == c)
 	{
@@ -137,55 +160,22 @@ void	ft_get_args_1(int *i, char *cmd, char c, t_redic **lst_of_red)
 		(*i)++;
 	if (cmd[*i])
 		(*i)--;
-	ft_lstadd_back_red(lst_of_red, ft_substr(cmd, j, *i - j + 1), c);
+	ft_lstadd_back_red(lst_of_red, ft_substr(cmd, j, (*i) - j + 1), c);
 }
 
 void	ft_get_args_and_red(char *cmd, t_pipe **lst_of_args, t_redic **lst_of_red)
 {
 	t_pipe	*tmp;
 	int		i;
-	int		j;
-	char	c;
 
 	i = 0;
 	tmp = *lst_of_args;
 	while (cmd[i])
 	{
 		if (cmd[i] == '>' || cmd[i] == '<')
-		{
-			// ft_get_args_1(&i, cmd, cmd[i], lst_of_red);
-			c = cmd[i];
-			i++;
-			if (cmd[i] == c)
-			{
-				i++;
-				c = 'a';
-			}
-			while (cmd[i] && cmd[i] == ' ')
-				i++;
-			j = i;
-			while (cmd[i] && !ft_strchr(" ><", cmd[i]))
-				i++;
-			if (cmd[i])
-				i--;
-			ft_lstadd_back_red(lst_of_red, ft_substr(cmd, j, i - j + 1), c);
-		}
+			ft_get_red(cmd, &i, lst_of_red);
 		else if (cmd[i] != ' ')
-		{
-			j = i;
-			while (cmd[i] && cmd[i] != ' ' && cmd[i] != '>' && cmd[i] != '<')
-			{
-				if (cmd[i] && (cmd[i] == '\"' || cmd[i] == '\''))
-				{
-					c = cmd[i];
-					i++;
-					while (cmd[i] && (cmd[i] != c))
-						i++;
-				}
-				i++;
-			}
-			ft_lstadd_back(lst_of_args, ft_substr(cmd, j, i - j));
-		}
+			ft_get_args(cmd, lst_of_args, &i);
 		i++;
 	}
 }
@@ -235,13 +225,59 @@ void	ft_puterror(char *err, char *msg)
 	ft_putstr_fd(msg, 2);
 }
 
+void	errno_err(char *ptr)
+{
+	if (errno == 2)
+	{
+		ft_puterror(ptr, ": No such file or directory\n");
+		exit (126);
+	}
+	else if (errno == 13)
+	{
+		ft_puterror(ptr, ":Permission denied\n");
+		exit (126);
+	}
+	else if (errno == 13)
+	{
+		ft_puterror(ptr, ":Permission denied\n");
+		exit (126);
+	}
+}
+
+void	exuc_cmd(char **ptr)
+{
+	char	**single_path;
+	int		i;
+
+	if (!access(ptr[0], F_OK))
+	{
+		execve(ptr[0], ptr, ft_get_env2());
+		errno_err(ptr[0]);
+	}
+	else if (ft_strchr(ptr[0], '/'))
+	{
+		execve(ptr[0], ptr, ft_get_env2());
+		errno_err(ptr[0]);
+	}
+	else
+	{
+		if (getenv("PATH"))
+		{
+			single_path = ft_split(getenv("PATH"), ':');
+			i = -1;
+			while (single_path[++i])
+				execve(ft_strjoin(ft_strjoin(single_path[i], "/"), ptr[0]), ptr, ft_get_env2());
+		}
+		ft_puterror(ptr[0], ":command not found\n");
+		exit(127);
+	}
+}
+
 void	ft_execution(char *cmd)
 {
 	t_pipe	*lst_of_args;
 	t_redic	*lst_of_red;
-	char	**single_path;
 	char	**ptr;
-	int		i;
 
 	lst_of_args = NULL;
 	lst_of_red = NULL;
@@ -249,42 +285,8 @@ void	ft_execution(char *cmd)
 	if (!lst_of_args)
 		exit (0);
 	ptr = args_lst_to_tab(lst_of_args);
-	i = -1;
 	if (lst_of_red)
 		run_rediction(lst_of_red);
 	ft_convert_to_lower(ptr[0]);
-	if (!access(ptr[0], F_OK))
-	{
-		execve(ptr[0], ptr, ft_get_env2());
-		if (errno == 13)
-		{
-			ft_puterror(ptr[0], ":Permission denied\n");
-			exit (126);
-		}
-	}
-	else if ( ft_strchr(ptr[0], '/'))
-	{
-		execve(ptr[0], ptr, ft_get_env2());
-		if (errno == 2)
-		{
-			ft_puterror(ptr[0], ": No such file or directory\n");
-			exit (126);
-		}
-		if (errno == 13)
-		{
-			ft_puterror(ptr[0], ":Permission denied\n");
-			exit (126);
-		}
-	}
-	else
-	{
-		if (getenv("PATH"))
-		{
-			single_path = ft_split(getenv("PATH"), ':');
-			while (single_path[++i])
-				execve(ft_strjoin(ft_strjoin(single_path[i], "/"), ptr[0]), ptr, ft_get_env2());
-		}
-		ft_puterror(ptr[0], ":command not found\n");
-		exit(127);
-	}
+	exuc_cmd(ptr);
 }

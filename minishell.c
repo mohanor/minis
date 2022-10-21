@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:43:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/21 01:09:25 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/21 01:29:22 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,21 +44,8 @@ void	only_export(void)
 	}
 }
 
-int	ft_bulletin(char *cmd)
+int	ft_bulletin_2(char **ptr)
 {
-	t_pipe	*lst_of_args;
-	t_redic	*lst_of_red;
-	char	**ptr;
-
-	lst_of_args = NULL;
-	lst_of_red = NULL;
-	ft_get_args_and_red(cmd, &lst_of_args, &lst_of_red);
-	if (lst_of_red)
-		run_rediction(lst_of_red);
-	if (!lst_of_args)
-		return (0);
-	ptr = args_lst_to_tab(lst_of_args);
-	ft_convert_to_lower(ptr[0]);
 	if (ft_strcmp(ptr[0], "pwd") == 0)
 		return (ft_pwd(ptr), 1);
 	if (ft_strcmp(ptr[0], "exit") == 0)
@@ -78,6 +65,23 @@ int	ft_bulletin(char *cmd)
 		return (ft_export(ptr), 1);
 	}
 	return (0);
+}
+int	ft_bulletin(char *cmd)
+{
+	t_pipe	*lst_of_args;
+	t_redic	*lst_of_red;
+	char	**ptr;
+
+	lst_of_args = NULL;
+	lst_of_red = NULL;
+	ft_get_args_and_red(cmd, &lst_of_args, &lst_of_red);
+	if (lst_of_red)
+		run_rediction(lst_of_red);
+	if (!lst_of_args)
+		return (0);
+	ptr = args_lst_to_tab(lst_of_args);
+	ft_convert_to_lower(ptr[0]);
+	return (ft_bulletin_2(ptr));
 }
 
 int	only_space(char *cmd)

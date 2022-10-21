@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 21:17:45 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/21 01:19:33 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/21 01:25:10 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,16 @@ char	*ft_pipe_1(char *pipe, char *cmd, int *i)
 	return (pipe);
 }
 
+char *ft_pipe_2(t_pipe	**t, char *pipe)
+{
+	ft_lstadd_back(t, pipe);
+	return (ft_strdup(""));
+}
+
 void	ft_pipe(char *cmd)
 {
 	int		i;
 	char	*pipe;
-	char	c;
 	t_pipe	*t;
 
 	i = 0;
@@ -60,25 +65,12 @@ void	ft_pipe(char *cmd)
 		if (cmd[i] != '|')
 		{
 			if (cmd[i] == '\"' || cmd[i] == '\'')
-			{
-				//ft_pipe_1(pipe, cmd, &i);
-				pipe = ft_strjoin(pipe, ft_substr(cmd, i, 1));
-				c = cmd[i++];
-				while (cmd[i] && cmd[i] != c)
-				{
-					pipe = ft_strjoin(pipe, ft_substr(cmd, i, 1));
-					i++;
-				}
-				pipe = ft_strjoin(pipe, ft_substr(cmd, i, 1));
-			}
+				pipe = ft_pipe_1(pipe, cmd, &i);
 			else
 				pipe = ft_strjoin(pipe, ft_substr(cmd, i, 1));
 		}
 		else if (cmd[i] == '|')
-		{
-			ft_lstadd_back(&t, pipe);
-			pipe = ft_strdup("");
-		}
+			pipe = ft_pipe_2(&t, pipe);
 		i++;
 	}
 	ft_lstadd_back(&t, pipe);
