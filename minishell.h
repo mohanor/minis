@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:44:10 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/20 00:34:37 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 21:41:23 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ typedef struct s_lexm
 
 //syntax error **********************************
 void					add_garbage(void *value);
-void	free_garbage(void);
+
 // int	ft_check_parenthese(char *cmd);
 int						ft_check_pipe(char *cmd);
 int						ft_check_red(char *cmd);
@@ -156,12 +156,7 @@ int						ft_strncmp(const char *s1, const char *s2, size_t n);
 t_env					*ft_lstnew_env(char *data, char *value);
 void					ft_lst_addback_env(t_env **lst, t_env *new);
 t_env					*ft_lstlast_env(t_env *lst);
-//lists
-/*
-	t_list	*ft_lstnew(void *content);
-	t_list	*ft_lstlast(t_list *lst);
-	void	ft_lstadd_back(t_list **alst, t_list *new);
-*/
+
 //minishell function
 void					ft_env(void);
 char					*ft_execute_bulletin(char *cmd);
@@ -173,7 +168,7 @@ void					*ft_get_data(char *cmd);
 char					*ft_get_value(char *cmd);
 void					ft_cd(char **path);
 
-// char		*ft_get_home(t_env *t);
+
 char					*ft_get_home(void);
 int						ft_exit(char **cmd);
 void					ft_unset(char *cmd);
@@ -210,5 +205,21 @@ void					ft_puterror(char *err, char *msg);
 void					add_to_lexer(t_lexm **lst, char *content);
 int						token(char *cmd);
 t_lexm					*new_lexer(char *content);
+
+// norm
+void					handle_sig(int pid);
+char					*lexter_to_string(t_lexm *lxm);
+t_lexm					*ft_lexer(char *cmd);
+void					handler(int sig);
+int						event(void);
+void					ft_change_pwd_and_old(char *ptr, char *cwd);
+
+
+// sayfe
+
+
+
+void					ft_new_env(char **env);
+void					ft_if_path(void);
 
 #endif

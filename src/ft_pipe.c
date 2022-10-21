@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/24 21:17:45 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/19 00:43:25 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/21 01:19:33 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,21 @@ void	skip_and_copy(char *line, int *k)
 	*k = i;
 }
 
+char	*ft_pipe_1(char *pipe, char *cmd, int *i)
+{
+	char	c;
+
+	pipe = ft_strjoin(pipe, ft_substr(cmd, *i, 1));
+	c = cmd[(*i)++];
+	while (cmd[*i] && cmd[*i] != c)
+	{
+		pipe = ft_strjoin(pipe, ft_substr(cmd, *i, 1));
+		(*i)++;
+	}
+	pipe = ft_strjoin(pipe, ft_substr(cmd, *i, 1));
+	return (pipe);
+}
+
 void	ft_pipe(char *cmd)
 {
 	int		i;
@@ -46,6 +61,7 @@ void	ft_pipe(char *cmd)
 		{
 			if (cmd[i] == '\"' || cmd[i] == '\'')
 			{
+				//ft_pipe_1(pipe, cmd, &i);
 				pipe = ft_strjoin(pipe, ft_substr(cmd, i, 1));
 				c = cmd[i++];
 				while (cmd[i] && cmd[i] != c)
@@ -67,5 +83,4 @@ void	ft_pipe(char *cmd)
 	}
 	ft_lstadd_back(&t, pipe);
 	ft_start_exe(t);
-	
 }

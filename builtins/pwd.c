@@ -3,14 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
+/*   By: skasmi <skasmi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/29 17:23:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/19 21:12:14 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 03:15:17 by skasmi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	ft_aux_pwd(char *add)
+{
+	t_env	*t;
+
+	t = g_var.env;
+	while (t)
+	{
+		if (ft_strcmp("PWD", t->data) == 0)
+			t->value = ft_strdup(add);
+		t = t->next;
+	}
+}
 
 void	ft_pwd(char **path)
 {
@@ -32,12 +45,7 @@ void	ft_pwd(char **path)
 		add_to_env = get_from_env("PWD");
 	if (add_to_env)
 	{
-		while (t)
-		{
-			if (ft_strcmp("PWD", t->data) == 0)
-				t->value = ft_strdup(add_to_env);
-			t = t->next;
-		}
+		ft_aux_pwd(add_to_env);
 		ft_putstr_fd(s, 1);
 		ft_putstr_fd("\n", 1);
 	}

@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 21:22:44 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/20 01:34:16 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/20 23:01:44 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,53 +40,13 @@ char	**ft_get_env2(void)
 	return (ptr);
 }
 
-void	ft_start_exe(t_pipe *lst)
+void	get_status(void)
 {
-	t_pipe	*tmp;
-	int		fd[2];
-	int		pid;
-	int		status;
+	int	status;
 
-	tmp = lst;
-	if (lst->next == NULL)
-		if (ft_bulletin(lst->cmd))
-			return ;
-	while (tmp)
-	{
-		if (tmp->next)
-			pipe(fd);
-		pid = fork();
-		if (pid < 0)
-		{
-			ft_puterror("fork", ": Resource temporarily unavailable\n");
-			g_var.status = 1;
-			return ;
-		}
-		if (pid == 0)
-		{
-			if (tmp->next)
-			{
-				dup2(fd[1], 1);
-				close(fd[1]);
-				close(fd[0]);
-			}
-			ft_execution(tmp->cmd);
-		}
-		if (tmp->next)
-		{
-			dup2(fd[0], 0);
-			close(fd[0]);
-			close(fd[1]);
-		}
-		else
-			close(0);
-		tmp = tmp->next;
-	}
 	while (1)
-	{
 		if (waitpid(-1, &status, 0) == -1)
 			break ;
-	}
 	if (WIFEXITED(status))
 		g_var.status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
@@ -97,8 +57,90 @@ void	ft_start_exe(t_pipe *lst)
 	}
 }
 
-void	ft_get_args_and_red(char *cmd, t_pipe **lst_of_args,
-		t_redic **lst_of_red)
+void	dup_1(int fd[2])
+{
+	dup2(fd[1], 1);
+	close(fd[1]);
+	close(fd[0]);
+}
+
+void	dup_0(int fd[2])
+{
+	dup2(fd[0], 0);
+	close(fd[0]);
+	close(fd[1]);
+}
+
+void	fork_resource(void)
+{
+	ft_puterror("fork", ": Resource temporarily unavailable\n");
+	g_var.status = 1;
+}
+
+void	sub_main(t_pipe *tmp, int fd[2])
+{
+	if (tmp->next)
+		dup_1(fd);
+	ft_execution(tmp->cmd);
+}
+
+void	main_exc(t_pipe *lst)
+{
+	t_pipe	*tmp;
+	int		fd[2];
+	int		pid;
+
+	tmp = lst;
+	while (tmp)
+	{
+		if (tmp->next)
+			pipe(fd);
+		pid = fork();
+		if (pid < 0)
+		{
+			fork_resource();
+			return ;
+		}
+		if (pid == 0)
+			sub_main(tmp, fd);
+		if (tmp->next)
+			dup_0(fd);
+		else
+			close(0);
+		tmp = tmp->next;
+	}
+}
+
+void	ft_start_exe(t_pipe *lst)
+{
+	if (lst->next == NULL)
+		if (ft_bulletin(lst->cmd))
+			return ;
+	main_exc(lst);
+	get_status();
+}
+
+void	ft_get_args_1(int *i, char *cmd, char c, t_redic **lst_of_red)
+{
+	int	j;
+
+	(*i)++;
+	if (cmd[*i] == c)
+	{
+		(*i)++;
+		c = 'a';
+	}
+	while (cmd[*i] && cmd[*i] == ' ')
+		(*i)++;
+	j = *i;
+	while (cmd[*i] && !ft_strchr(" ><", cmd[*i]))
+		(*i)++;
+	if (cmd[*i])
+		(*i)--;
+	ft_lstadd_back_red(lst_of_red, ft_substr(cmd, j, *i - j + 1), c);
+}
+
+void	ft_get_args_and_red(char *cmd, t_pipe **lst_of_args, t_redic **lst_of_red)
 {
 	t_pipe	*tmp;
 	int		i;
@@ -111,6 +153,7 @@ void	ft_get_args_and_red(char *cmd, t_pipe **lst_of_args,
 	{
 		if (cmd[i] == '>' || cmd[i] == '<')
 		{
+			// ft_get_args_1(&i, cmd, cmd[i], lst_of_red);
 			c = cmd[i];
 			i++;
 			if (cmd[i] == c)
@@ -121,7 +164,7 @@ void	ft_get_args_and_red(char *cmd, t_pipe **lst_of_args,
 			while (cmd[i] && cmd[i] == ' ')
 				i++;
 			j = i;
-			while (cmd[i] && !ft_strchr(" ><", cmd[i])) //  cmd[i] != ' ')
+			while (cmd[i] && !ft_strchr(" ><", cmd[i]))
 				i++;
 			if (cmd[i])
 				i--;
@@ -225,6 +268,11 @@ void	ft_execution(char *cmd)
 		if (errno == 2)
 		{
 			ft_puterror(ptr[0], ": No such file or directory\n");
+			exit (126);
+		}
+		if (errno == 13)
+		{
+			ft_puterror(ptr[0], ":Permission denied\n");
 			exit (126);
 		}
 	}

@@ -6,7 +6,7 @@
 #    By: matef <matef@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/07/27 15:37:33 by skasmi            #+#    #+#              #
-#    Updated: 2022/10/19 21:15:57 by matef            ###   ########.fr        #
+#    Updated: 2022/10/20 03:06:38 by matef            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,7 +62,8 @@ SRCS=	minishell.c \
 		src/open_files.c \
 		src/heredoc.c\
 		src/garbage.c\
-		src/expand.c
+		src/expand.c\
+		src/utils_1.c
 
 
 BOBJCTS=$(BSRCS:%.c=%.o)

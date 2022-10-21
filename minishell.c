@@ -6,7 +6,7 @@
 /*   By: matef <matef@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/14 15:43:42 by skasmi            #+#    #+#             */
-/*   Updated: 2022/10/20 01:30:15 by matef            ###   ########.fr       */
+/*   Updated: 2022/10/21 01:09:25 by matef            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	ft_bulletin(char *cmd)
 	if (lst_of_red)
 		run_rediction(lst_of_red);
 	if (!lst_of_args)
-		return 0;
+		return (0);
 	ptr = args_lst_to_tab(lst_of_args);
 	ft_convert_to_lower(ptr[0]);
 	if (ft_strcmp(ptr[0], "pwd") == 0)
@@ -80,56 +80,6 @@ int	ft_bulletin(char *cmd)
 	return (0);
 }
 
-/**
-	to do list 
-	expand // need to be fixed
-	convert comand to lowercase LS=>ls
-	extract comand from dqoutes "l""s" => ls
-	heredoc
-	echo 
-	export
-	exuction
- */
-
-/**
- * 
- * 
- * export -------> done
- * exucution --------> done
- * 
- * 
- */
-
-/**
- *  # error need to be fixed in bultins
- * 
- * 
- *  
- * ## builtins errors
- * echo with -nnnnnnnnnn
- * unset with multipe var // remove the middle one
- * cd error // when remove courent folder
- * pwd error // when can't find .
- * 
- * 
- * 
- * ## bultins finished
- * ---> export
-*/
-
-/**
- * # syntax errors
- * 
- * <<< // must be handle
- * echo "'   << >     |"| // syntax error
- * |" d" // syntax error
- * 
- * new syntax error
- * << f
- * 
- * 
-*/
-
 int	only_space(char *cmd)
 {
 	int	i;
@@ -143,6 +93,53 @@ int	only_space(char *cmd)
 	return (1);
 }
 
+char	*get_unique_name(void)
+{
+	static int	nb;
+
+	return (ft_strjoin("/tmp/here_file_", ft_itoa(nb++)));
+}
+
+int	here_loop(t_lexm *tmp, char *file_name, int fd)
+{
+	char		*line;
+
+	line = readline("> ");
+	add_garbage(line);
+	if (!line || ft_strcmp(tmp->next->cmd, line) == 0 || g_var.doc)
+	{
+		tmp->cmd = "<";
+		tmp->next->cmd = file_name;
+		close (fd);
+		return (1);
+	}
+	write (fd, ft_strjoin(line, "\n"), ft_strlen(line) + 1);
+	return (0);
+}
+
+void	main_heredoc(t_lexm **lexer)
+{
+	char		*file_name;
+	t_lexm		*tmp;
+	int			fd;
+
+	tmp = *lexer;
+	while (tmp && !g_var.doc)
+	{
+		if (tmp->type == HEREDOC)
+		{
+			file_name = get_unique_name();
+			fd = open(file_name, O_RDWR | O_CREAT, 0666);
+			while (1)
+			{
+				if (here_loop(tmp, file_name, fd))
+					break ;
+			}
+		}
+		tmp = tmp->next;
+	}
+}
+
 void	handler(int sig)
 {
 	(void)sig;
@@ -150,175 +147,77 @@ void	handler(int sig)
 	rl_done = 1;
 }
 
-int event(void)
+int	event(void)
 {
-	return 0;
+	return (0);
 }
 
 void	ft_run_heredoc(t_lexm **lexer)
 {
-	t_lexm		*tmp;
-	char		*line;
-	int 		fd;
-	static int	nb;
-	char		*file_name;
-
-	tmp = *lexer;
 	g_var.doc = 0;
 	signal(SIGINT, handler);
 	rl_event_hook = event;
-	while (tmp)
-	{
-		if (tmp->type == HEREDOC)
-		{
-			file_name = ft_strjoin("/tmp/here_file_", ft_itoa(nb++));
-			fd = open(file_name, O_RDWR | O_CREAT, 0666);
-			while (1)
-			{
-				line = readline("> ");
-				add_garbage(line);
-				if (!line || ft_strcmp(tmp->next->cmd, line) == 0 || g_var.doc)
-				{
-					tmp->cmd = "<";
-					tmp->next->cmd = file_name;
-					close (fd);
-					break;
-				}
-				write (fd, ft_strjoin(line, "\n"), ft_strlen(line) + 1);
-			}
-		}
-		tmp = tmp->next;
-	}
+	main_heredoc(lexer);
 }
 
-t_lexm *ft_lexer(char *cmd)
+char	*check_heredoc(char *cmd)
 {
-	int 	i;
-	char 	qouts;
-	char 	*to_expand;
-	t_lexm 	*lexer;
+	t_lexm	*here;
 
-	i = 0;
-	to_expand = ft_strdup("");
-	lexer = NULL;
-	while (cmd[i])
-	{
-		while (cmd[i] && cmd[i] != ' ')
-		{
-			if (cmd[i] == '\'' || cmd[i] == '\"')
-			{
-				qouts = cmd[i];
-				to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				i++;
-				while (cmd[i] && cmd[i] != qouts)
-				{
-					to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-					i++;
-				}
-				to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				i++;
-			}
-			else
-			{
-				if (cmd[i] != '>' && cmd[i] != '<' && cmd[i] != '|')
-					to_expand = ft_strjoin(to_expand, ft_substr(cmd, i, 1));
-				else
-				{
-					if (to_expand[0] != '\0')
-					{
-						add_to_lexer(&lexer, to_expand);
-						to_expand = ft_strdup("");
-					}
-					if (cmd[i + 1] == cmd[i])
-					{
-						add_to_lexer(&lexer, ft_substr(cmd, i, 2));
-						i++;
-					}
-					else
-						add_to_lexer(&lexer, ft_substr(cmd, i, 1));
-				}
-				i++;
-			}
-		}
-		if (to_expand[0] != '\0')
-		{
-			add_to_lexer(&lexer, to_expand);
-			to_expand = ft_strdup("");
-		}
-		i++;
-	}
-	return lexer;
+	here = ft_lexer(cmd);
+	ft_run_heredoc(&here);
+	return (lexter_to_string(here));
 }
 
-char *lexter_to_string(t_lexm *lxm)
+void	pass_or_not(char *cmd)
 {
-	char *ret;
-
-	ret = ft_strdup("");
-	while (lxm)
-	{
-		ret = ft_strjoin(ret, ft_strjoin(lxm->cmd, " "));
-		lxm = lxm->next;
-	}
-	return ret;
+	cmd = check_heredoc(cmd);
+	if (g_var.doc == 1)
+		g_var.doc = 0;
+	else
+		ft_pipe(cmd);
 }
 
-void	handle_sig(int pid)
+void	ft_start(int fd[2])
 {
-	(void)pid;
-	rl_replace_line("", 0);
-	printf("\n");
-	rl_on_new_line();
-	rl_redisplay();
+	char	*cmd;
+
+	while (1)
+	{
+		g_var.doc = 0;
+		cmd = readline("FRATELLO😈=> ");
+		add_garbage(cmd);
+		if (!cmd)
+			break ;
+		if (cmd[0] == '\0' || only_space(cmd))
+			continue ;
+		add_history(cmd);
+		if (ft_syntax_general(cmd) == 1)
+		{
+			cmd = check_heredoc(cmd);
+			ft_putstr_fd("\033[31mMinishell : syntax error !!!\n\033[37m", 2);
+		}
+		else
+			pass_or_not(cmd);
+		dup2(fd[0], 0);
+		dup2(fd[1], 1);
+	}
 }
 
 int	main(int ac, char **av, char **env)
 {
-	char	*cmd;
 	int		fd[2];
-	t_lexm 	*here;
 
 	fd[0] = dup(0);
 	fd[1] = dup(1);
 	(void)av;
 	if (ac == 1)
 	{
-		g_var.garbage = NULL;
-		signal(SIGQUIT, SIG_IGN);
 		signal(SIGINT, handle_sig);
+		signal(SIGQUIT, SIG_IGN);
+		g_var.garbage = NULL;
 		ft_new_env(env);
-		while (1)
-		{
-			here = NULL;
-			g_var.doc = 0;
-			cmd = readline("FRATELLO😈=> ");
-			add_garbage(cmd);
-			if (!cmd)
-				break ;
-			if (cmd[0] == '\0' || only_space(cmd))
-				continue ;
-			add_history(cmd);
-			if (ft_syntax_general(cmd) == 1)
-			{
-				here = ft_lexer(cmd);
-				ft_run_heredoc(&here);
-				cmd = lexter_to_string(here);
-				ft_putstr_fd("\033[31mMinishell : syntax error !!!\n\033[37m", 2);
-			}
-			else
-			{
-				here = ft_lexer(cmd);
-				ft_run_heredoc(&here);
-				cmd = lexter_to_string(here);
-				if (g_var.doc == 1)
-					g_var.doc = 0;
-				else
-					ft_pipe(cmd);
-			}
-			dup2(fd[0], 0);
-			dup2(fd[1], 1);
-			// free_garbage();
-		}
+		ft_start(fd);
 		close(fd[0]);
 		close(fd[1]);
 	}
